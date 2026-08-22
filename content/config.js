@@ -24,7 +24,7 @@ window.PARTY_CONTENT = {
   // SHA-256 hex hash of your admin password (NOT the plaintext password).
   // This is a casual deterrent only, not real security — see README.md.
   // Generate it via the snippet in README.md.
-  adminPasswordHash: "REPLACE_ME_PASSWORD_HASH",
+  adminPasswordHash: "c209e69ffd70e7b5d38b00f119b8d204a3eecaecb30aede66a6ab124993010b9",
 
   // One entry per family event/celebration. Today there's just one; the admin
   // panel appends more here later, publishing straight to GitHub.
