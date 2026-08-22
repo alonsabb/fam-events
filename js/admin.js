@@ -46,6 +46,7 @@ window.AdminModule = (function () {
           </p>
           <input type="password" class="admin-modal__token" placeholder="github_pat_..." autocomplete="off" />
           <button class="admin-modal__submit" data-action="save-token">שמירת טוקן</button>
+          <p class="admin-modal__error" hidden></p>
         </div>
         <div class="admin-modal__step" data-step="form" hidden>
           <h2>הוספת אירוע חדש</h2>
@@ -107,11 +108,30 @@ window.AdminModule = (function () {
     }
   }
 
-  function saveToken() {
+  async function saveToken() {
     const token = panel.querySelector(".admin-modal__token").value.trim();
     if (!token) return;
+
+    const btn = panel.querySelector('[data-action="save-token"]');
+    const errorEl = panel.querySelector('[data-step="token"] .admin-modal__error');
+    errorEl.hidden = true;
+    btn.disabled = true;
+    btn.textContent = "בודק טוקן…";
+
     localStorage.setItem(TOKEN_KEY, token);
-    showStep("form");
+    try {
+      // A lightweight read against the exact endpoint publish() needs,
+      // so a bad/insufficiently-scoped token is caught here — not after
+      // filling out the whole event form.
+      await githubRequest("/contents/content/config.js", { method: "GET" });
+      showStep("form");
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.hidden = false;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "שמירת טוקן";
+    }
   }
 
   async function githubRequest(path, options) {
