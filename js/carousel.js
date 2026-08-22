@@ -8,7 +8,7 @@
 window.CarouselModule = (function () {
   "use strict";
 
-  let container, frame, fallback, fallbackLink, demo, demoLabel, caption, counter;
+  let container, frame, image, fallback, fallbackLink, demo, demoLabel, caption, counter;
   let items = [];
   let index = 0;
   let mounted = false;
@@ -26,6 +26,7 @@ window.CarouselModule = (function () {
       <div class="carousel__stage">
         <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8250;</button>
         <div class="carousel__frame-wrap">
+          <img class="carousel__image" alt="" hidden />
           <iframe class="carousel__frame" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
           <div class="carousel__fallback" hidden>
             <a class="carousel__fallback-link" target="_blank" rel="noopener">פתח בדרייב</a>
@@ -44,6 +45,7 @@ window.CarouselModule = (function () {
     `;
 
     frame = container.querySelector(".carousel__frame");
+    image = container.querySelector(".carousel__image");
     fallback = container.querySelector(".carousel__fallback");
     fallbackLink = container.querySelector(".carousel__fallback-link");
     demo = container.querySelector(".carousel__demo");
@@ -93,14 +95,25 @@ window.CarouselModule = (function () {
     withTransition(() => {
       const isDemo = item.kind === "image-demo" || item.kind === "video-demo";
       frame.hidden = true;
+      image.hidden = true;
       fallback.hidden = true;
       demo.hidden = true;
       frame.src = "about:blank";
+      image.src = "";
 
       if (isDemo) {
         demo.hidden = false;
         demo.style.background = item.color || "var(--viewer-bg-soft)";
         demoLabel.textContent = item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה";
+      } else if (item.imageUrl) {
+        image.hidden = false;
+        image.onerror = () => {
+          // Rare fallback if the direct image load itself ever fails.
+          image.hidden = true;
+          fallback.hidden = false;
+          fallbackLink.href = item.driveUrl || "#";
+        };
+        image.src = item.imageUrl;
       } else if (item.embedUrl) {
         frame.hidden = false;
         frame.src = item.embedUrl;

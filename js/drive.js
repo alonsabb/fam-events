@@ -48,10 +48,14 @@ window.DriveModule = (function () {
     const base = { id: file.id, name: file.name, mimeType: file.mimeType };
 
     if (file.mimeType.startsWith("image/")) {
+      // Drive's /preview iframe blocks framing for image files specifically
+      // (confirmed: video/slides previews work fine, images don't) — load
+      // as a plain <img> instead, which isn't subject to frame-ancestors at
+      // all since it's a resource load, not a document embed.
       return {
         ...base,
         kind: "image",
-        embedUrl: `https://drive.google.com/file/d/${file.id}/preview`,
+        imageUrl: `https://drive.google.com/thumbnail?id=${file.id}&sz=w2000`,
         driveUrl: `https://drive.google.com/file/d/${file.id}/view`
       };
     }
