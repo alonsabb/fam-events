@@ -60,10 +60,16 @@ window.DriveModule = (function () {
       };
     }
     if (file.mimeType.startsWith("video/")) {
+      // Same reasoning as images: Drive's /preview iframe intermittently
+      // tries to nest an accounts.google.com sign-in frame internally,
+      // which can never work embedded in a third-party site (frame-ancestors
+      // checks the whole ancestor chain) — no reliable way to detect that
+      // failure and fall back. A poster thumbnail + tap-to-watch-on-Drive
+      // is slower (leaves the page) but works every time.
       return {
         ...base,
         kind: "video",
-        embedUrl: `https://drive.google.com/file/d/${file.id}/preview`,
+        imageUrl: `https://drive.google.com/thumbnail?id=${file.id}&sz=w2000`,
         driveUrl: `https://drive.google.com/file/d/${file.id}/view`
       };
     }

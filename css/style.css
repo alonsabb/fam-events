@@ -332,7 +332,6 @@ button {
 .carousel {
   width: 100%;
   max-width: 1000px;
-  view-transition-name: carousel;
 }
 
 .carousel__stage {
@@ -640,4 +639,18 @@ body.carousel-fullscreen {
     font-size: 1.4rem;
     padding: 0.35rem 0.6rem;
   }
+}
+
+#build-tag {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  z-index: 999;
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  opacity: 0.55;
+  pointer-events: none;
+  background: var(--surface);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
 }

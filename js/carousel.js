@@ -88,42 +88,49 @@ window.CarouselModule = (function () {
     }
   }
 
+  function renderCurrent() {
+    const item = items[index];
+    const isDemo = item.kind === "image-demo" || item.kind === "video-demo";
+    frame.hidden = true;
+    image.hidden = true;
+    fallback.hidden = true;
+    demo.hidden = true;
+    frame.src = "about:blank";
+    image.src = "";
+
+    if (isDemo) {
+      demo.hidden = false;
+      demo.style.background = item.color || "var(--viewer-bg-soft)";
+      demoLabel.textContent = item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה";
+    } else if (item.imageUrl) {
+      image.hidden = false;
+      image.onerror = () => {
+        // Rare fallback if the direct image load itself ever fails.
+        image.hidden = true;
+        fallback.hidden = false;
+        fallbackLink.href = item.driveUrl || "#";
+      };
+      image.src = item.imageUrl;
+    } else if (item.embedUrl) {
+      frame.hidden = false;
+      frame.src = item.embedUrl;
+    } else {
+      fallback.hidden = false;
+      fallbackLink.href = item.driveUrl || "#";
+    }
+    caption.textContent = item.name || "";
+    counter.textContent = `${index + 1} מתוך ${items.length}`;
+  }
+
+  // Navigation (prev/next/keyboard/swipe) — wrapped in its own transition
+  // for a crossfade. NOT used for the initial mount, since that already
+  // happens inside app.js's own transition; nesting document.startView
+  // Transition() calls aborts the inner one and can leave a stale,
+  // blank captured frame stuck on top of the real (already-updated) DOM.
   function show(i) {
     if (!items.length) return;
     index = (i + items.length) % items.length;
-    const item = items[index];
-    withTransition(() => {
-      const isDemo = item.kind === "image-demo" || item.kind === "video-demo";
-      frame.hidden = true;
-      image.hidden = true;
-      fallback.hidden = true;
-      demo.hidden = true;
-      frame.src = "about:blank";
-      image.src = "";
-
-      if (isDemo) {
-        demo.hidden = false;
-        demo.style.background = item.color || "var(--viewer-bg-soft)";
-        demoLabel.textContent = item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה";
-      } else if (item.imageUrl) {
-        image.hidden = false;
-        image.onerror = () => {
-          // Rare fallback if the direct image load itself ever fails.
-          image.hidden = true;
-          fallback.hidden = false;
-          fallbackLink.href = item.driveUrl || "#";
-        };
-        image.src = item.imageUrl;
-      } else if (item.embedUrl) {
-        frame.hidden = false;
-        frame.src = item.embedUrl;
-      } else {
-        fallback.hidden = false;
-        fallbackLink.href = item.driveUrl || "#";
-      }
-      caption.textContent = item.name || "";
-      counter.textContent = `${index + 1} מתוך ${items.length}`;
-    });
+    withTransition(renderCurrent);
   }
 
   function toggleFullscreen() {
@@ -136,7 +143,8 @@ window.CarouselModule = (function () {
     mountEl.appendChild(container);
     items = itemList;
     mounted = true;
-    show(startIndex || 0);
+    index = ((startIndex || 0) + items.length) % items.length;
+    renderCurrent();
   }
 
   function unmount() {
