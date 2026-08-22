@@ -120,10 +120,12 @@ window.AdminModule = (function () {
 
     localStorage.setItem(TOKEN_KEY, token);
     try {
-      // A lightweight read against the exact endpoint publish() needs,
-      // so a bad/insufficiently-scoped token is caught here — not after
-      // filling out the whole event form.
-      await githubRequest("/contents/content/config.js", { method: "GET" });
+      // A read-only check isn't enough — a token can have Contents:
+      // Read-only and pass a GET while still failing at publish time.
+      // Create-then-delete a throwaway file to actually prove write
+      // access, so a wrongly-scoped token is caught here instead of
+      // after filling out the whole event form.
+      await verifyWriteAccess();
       showStep("form");
     } catch (err) {
       errorEl.textContent = err.message;
@@ -132,6 +134,28 @@ window.AdminModule = (function () {
       btn.disabled = false;
       btn.textContent = "שמירת טוקן";
     }
+  }
+
+  async function verifyWriteAccess() {
+    const testPath = "content/.token-check";
+    const created = await githubRequest(`/contents/${testPath}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Verify admin token write access",
+        content: toBase64("ok"),
+        branch: config.githubRepo.branch
+      })
+    });
+    await githubRequest(`/contents/${testPath}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Clean up token check",
+        sha: created.content.sha,
+        branch: config.githubRepo.branch
+      })
+    });
   }
 
   async function githubRequest(path, options) {
