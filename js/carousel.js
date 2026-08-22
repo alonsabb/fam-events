@@ -26,7 +26,7 @@ window.CarouselModule = (function () {
       <div class="carousel__stage">
         <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8250;</button>
         <div class="carousel__frame-wrap">
-          <iframe class="carousel__frame" loading="lazy" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
+          <iframe class="carousel__frame" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
           <div class="carousel__fallback" hidden>
             <a class="carousel__fallback-link" target="_blank" rel="noopener">פתח בדרייב</a>
           </div>
