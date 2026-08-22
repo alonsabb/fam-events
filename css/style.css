@@ -1,0 +1,634 @@
+/* ==========================================================================
+   Design tokens — bright & cheery warm palette
+   ========================================================================== */
+:root {
+  --bg: #fff3e4;
+  --surface: #ffffff;
+  --surface-warm: #ffe8d1;
+  --ink: #4a2e1a;
+  --ink-dim: #8a6b52;
+
+  --coral: #ff6f4d;
+  --coral-deep: #e8532f;
+  --gold: #ffb648;
+  --pink: #ff6f91;
+
+  --viewer-bg: #241a12;
+  --viewer-bg-soft: #33261a;
+  --scrim: rgba(24, 15, 9, 0.93);
+  --error: #d64545;
+  --shadow: rgba(139, 74, 33, 0.18);
+
+  --font-display: Georgia, "David", "Times New Roman", "Noto Serif Hebrew", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Arial Hebrew", system-ui, sans-serif;
+
+  --radius: 14px;
+  --sidebar-width: 300px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  margin: 0 0 0.4em;
+}
+
+a {
+  color: var(--coral-deep);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   Ambient background: moving color washes + rising particles + grain
+   ========================================================================== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.backdrop__blob {
+  position: absolute;
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  animation: drift 16s ease-in-out infinite;
+}
+
+.backdrop__blob--1 {
+  top: -12%;
+  left: -12%;
+  background: radial-gradient(circle, var(--coral) 0%, transparent 68%);
+  animation-duration: 15s;
+}
+
+.backdrop__blob--2 {
+  bottom: -20%;
+  right: -12%;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 68%);
+  animation-duration: 19s;
+  animation-delay: -5s;
+}
+
+.backdrop__blob--3 {
+  top: 20%;
+  left: 30%;
+  width: 42vw;
+  height: 42vw;
+  background: radial-gradient(circle, var(--pink) 0%, transparent 68%);
+  animation-duration: 23s;
+  animation-delay: -10s;
+  opacity: 0.4;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(14%, 16%) scale(1.2); }
+  66% { transform: translate(-16%, -9%) scale(0.85); }
+}
+
+.backdrop__particle {
+  position: absolute;
+  bottom: -5%;
+  border-radius: 50%;
+  opacity: 0;
+  animation: rise linear infinite;
+}
+
+@keyframes rise {
+  0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+  10% { opacity: 0.65; }
+  85% { opacity: 0.55; }
+  100% { transform: translate(var(--drift-x, 30px), -115vh) scale(1.1); opacity: 0; }
+}
+
+.backdrop__grain {
+  position: absolute;
+  inset: -10%;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop__blob,
+  .backdrop__particle,
+  .sidebar__header h1 {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   App layout: sidebar + content pane
+   ========================================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  border-inline-end: 1px solid rgba(139, 74, 33, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sidebar__header h1 {
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  color: var(--coral-deep);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .sidebar__header h1 {
+    background: linear-gradient(100deg, var(--coral-deep) 15%, var(--gold) 45%, var(--pink) 65%, var(--coral-deep) 85%);
+    background-size: 250% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 5s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+.sidebar__subtitle {
+  margin: 0.2em 0 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.sidebar__date {
+  margin: 0.2em 0 0;
+  color: var(--ink-dim);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sidebar__back {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: var(--coral-deep);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 2rem;
+}
+
+.sidebar__nav-status {
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.sidebar__nav-status--demo {
+  color: var(--coral-deep);
+}
+
+.sidebar__nav-status--error {
+  color: var(--error);
+}
+
+.sidebar__link {
+  text-align: start;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--ink-dim);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.sidebar__link:hover {
+  background: rgba(255, 111, 77, 0.1);
+  color: var(--ink);
+}
+
+.sidebar__link.is-active {
+  background: rgba(255, 111, 77, 0.14);
+  border-color: rgba(255, 111, 77, 0.4);
+  color: var(--coral-deep);
+  font-weight: 600;
+}
+
+.sidebar__admin {
+  margin-top: auto;
+  padding-top: 2rem;
+  color: rgba(138, 107, 82, 0.45);
+  text-decoration: none;
+  font-size: 0.75rem;
+}
+
+.sidebar__admin:hover {
+  color: var(--coral-deep);
+}
+
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  inset-inline-start: 1rem;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid rgba(139, 74, 33, 0.2);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--shadow);
+}
+
+.content-pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.welcome {
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.welcome h2 {
+  color: var(--coral-deep);
+}
+
+.content-pane__status {
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.content-pane__status--error {
+  color: var(--error);
+}
+
+.content-pane__status--demo {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 1px dashed rgba(255, 111, 77, 0.45);
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  max-width: 90%;
+  text-align: center;
+  z-index: 5;
+  color: var(--ink-dim);
+  box-shadow: 0 4px 14px var(--shadow);
+}
+
+/* ==========================================================================
+   Carousel — kept as a dark, neutral "viewer" stage for good media contrast,
+   even against the bright surrounding shell
+   ========================================================================== */
+.carousel {
+  width: 100%;
+  max-width: 1000px;
+  view-transition-name: carousel;
+}
+
+.carousel__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--viewer-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 12px 32px var(--shadow);
+}
+
+.carousel__frame-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.carousel__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.carousel__fallback,
+.carousel__demo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--viewer-bg-soft);
+}
+
+.carousel__demo-label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.carousel__nav,
+.carousel__expand {
+  position: absolute;
+  background: rgba(24, 15, 9, 0.45);
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 0.4rem 0.9rem;
+  line-height: 1;
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.carousel__nav--prev {
+  inset-inline-start: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel__nav--next {
+  inset-inline-end: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel__expand {
+  top: 0.75rem;
+  inset-inline-end: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.carousel__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.9rem;
+  color: var(--ink-dim);
+  font-size: 0.9rem;
+}
+
+/* Fullscreen mode: promote the carousel to a fixed overlay covering the
+   whole viewport, hiding the sidebar for an immersive view. */
+.carousel.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--scrim);
+}
+
+.carousel.is-fullscreen .carousel__stage {
+  aspect-ratio: auto;
+  flex: 1;
+}
+
+body.carousel-fullscreen {
+  overflow: hidden;
+}
+
+::view-transition-old(carousel),
+::view-transition-new(carousel) {
+  animation-duration: 0.35s;
+}
+
+/* ==========================================================================
+   Event picker
+   ========================================================================== */
+.picker {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.picker__title {
+  color: var(--coral-deep);
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+}
+
+.picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.picker__card {
+  background: var(--surface);
+  border: 1px solid rgba(255, 111, 77, 0.25);
+  border-radius: var(--radius);
+  color: var(--ink);
+  padding: 2rem 1.25rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.picker__card:hover {
+  transform: translateY(-4px);
+  border-color: var(--coral);
+}
+
+.picker__card h2 {
+  color: var(--coral-deep);
+  font-size: 1.3rem;
+}
+
+.picker__date {
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ==========================================================================
+   Admin modal
+   ========================================================================== */
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--scrim);
+}
+
+.admin-modal.is-open {
+  display: flex;
+}
+
+.admin-modal__box {
+  position: relative;
+  width: min(92vw, 480px);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid rgba(255, 111, 77, 0.25);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.admin-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-end: 1rem;
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.admin-modal h2 {
+  color: var(--coral-deep);
+}
+
+.admin-modal__hint {
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+}
+
+.admin-modal input,
+.admin-modal label {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.9rem;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+}
+
+.admin-modal input {
+  background: var(--bg);
+  border: 1px solid rgba(139, 74, 33, 0.2);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.admin-modal__submit {
+  width: 100%;
+  background: linear-gradient(100deg, var(--coral) 0%, var(--gold) 100%);
+  border: none;
+  color: #3a1f0f;
+  font-weight: 700;
+  padding: 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-modal__error {
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+.admin-modal__success {
+  color: var(--coral-deep);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 0 0 25vw;
+    z-index: 40;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 40px var(--shadow);
+    background: var(--surface);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .content-pane {
+    padding: 4.5rem 1.25rem 2rem;
+  }
+
+  .carousel__nav {
+    font-size: 1.4rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
