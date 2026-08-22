@@ -126,6 +126,12 @@ window.AdminModule = (function () {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem(TOKEN_KEY);
+        throw new Error(
+          "הטוקן שנשמר לא תקין או שאין לו הרשאות מספיקות. הוא נמחק — פתחו את הניהול שוב כדי להזין טוקן חדש."
+        );
+      }
       throw new Error(body.message || `GitHub API error (${res.status})`);
     }
     return res.json();
