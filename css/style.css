@@ -114,19 +114,30 @@ button {
   66% { transform: translate(-16%, -9%) scale(0.85); }
 }
 
-.backdrop__particle {
+.backdrop__particles {
   position: absolute;
-  bottom: -5%;
-  border-radius: 50%;
-  opacity: 0;
-  animation: rise linear infinite;
+  inset: 0;
 }
 
-@keyframes rise {
-  0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
-  10% { opacity: 0.3; }
-  85% { opacity: 0.22; }
-  100% { transform: translate(var(--drift-x, 30px), -115vh) scale(1.1); opacity: 0; }
+.backdrop__particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: float ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Each particle wanders through its own four waypoints (set inline as
+   --dx1..--dy4 by js/backdrop.js) rather than following a single shared
+   path — reads as loose, random drifting instead of uniform motion. */
+@keyframes float {
+  0% { transform: translate(0, 0) scale(0.85); opacity: 0; }
+  12% { opacity: var(--o, 0.3); }
+  30% { transform: translate(var(--dx1, 10vw), var(--dy1, -8vh)) scale(1); }
+  55% { transform: translate(var(--dx2, -14vw), var(--dy2, 12vh)) scale(1.08); }
+  78% { transform: translate(var(--dx3, 10vw), var(--dy3, 8vh)) scale(0.95); }
+  90% { opacity: var(--o, 0.3); }
+  100% { transform: translate(var(--dx4, 0), var(--dy4, 0)) scale(0.85); opacity: 0; }
 }
 
 .backdrop__grain {
