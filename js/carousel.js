@@ -89,6 +89,25 @@ window.CarouselModule = (function () {
       demo.style.background = item.color || "var(--viewer-bg-soft)";
       demo.appendChild(el("span", "carousel__demo-label", item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה"));
       frameWrap.appendChild(demo);
+    } else if (item.kind === "video") {
+      if (item.videoMediaUrl) {
+        // Streams file bytes directly via the Drive API (see drive.js
+        // classifyFile) rather than Drive's /preview iframe. Falls back to
+        // the poster + tap-to-watch-on-Drive if playback fails.
+        const video = document.createElement("video");
+        video.className = "carousel__video";
+        video.controls = true;
+        video.preload = "metadata";
+        video.poster = item.imageUrl || "";
+        video.onerror = () => {
+          frameWrap.innerHTML = "";
+          frameWrap.appendChild(buildVideoPoster(item));
+        };
+        video.src = item.videoMediaUrl;
+        frameWrap.appendChild(video);
+      } else {
+        frameWrap.appendChild(buildVideoPoster(item));
+      }
     } else if (item.imageUrl) {
       const image = document.createElement("img");
       image.className = "carousel__image";
@@ -98,22 +117,7 @@ window.CarouselModule = (function () {
         frameWrap.appendChild(buildFallback(item));
       };
       image.src = item.imageUrl;
-
-      if (item.kind === "video") {
-        // Poster thumbnail only — Drive's embed iframe doesn't reliably play
-        // video (see drive.js classifyFile) — so the poster links out to
-        // Drive to actually watch, with a play icon marking it as a video.
-        const link = document.createElement("a");
-        link.className = "carousel__video-link";
-        link.target = "_blank";
-        link.rel = "noopener";
-        link.href = item.driveUrl || "#";
-        link.appendChild(image);
-        link.appendChild(el("span", "carousel__play-icon", "&#9658;"));
-        frameWrap.appendChild(link);
-      } else {
-        frameWrap.appendChild(image);
-      }
+      frameWrap.appendChild(image);
     } else if (item.embedUrl) {
       const frame = document.createElement("iframe");
       frame.className = "carousel__frame";
@@ -126,6 +130,21 @@ window.CarouselModule = (function () {
     }
     caption.textContent = item.name || "";
     counter.textContent = `${index + 1} מתוך ${items.length}`;
+  }
+
+  function buildVideoPoster(item) {
+    const link = document.createElement("a");
+    link.className = "carousel__video-link";
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.href = item.driveUrl || "#";
+    const image = document.createElement("img");
+    image.className = "carousel__image";
+    image.alt = "";
+    image.src = item.imageUrl || "";
+    link.appendChild(image);
+    link.appendChild(el("span", "carousel__play-icon", "&#9658;"));
+    return link;
   }
 
   function buildFallback(item) {

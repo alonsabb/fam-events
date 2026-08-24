@@ -44,7 +44,7 @@ window.DriveModule = (function () {
   }
 
   // Classifies a Drive file into a renderable leaf item.
-  function classifyFile(file) {
+  function classifyFile(file, apiKey) {
     const base = { id: file.id, name: file.name, mimeType: file.mimeType };
 
     if (file.mimeType.startsWith("image/")) {
@@ -70,6 +70,11 @@ window.DriveModule = (function () {
         ...base,
         kind: "video",
         imageUrl: `https://drive.google.com/thumbnail?id=${file.id}&sz=w2000`,
+        // Streams file bytes directly via the Drive API's alt=media endpoint
+        // rather than embedding Drive's /preview iframe (see comment above)
+        // — a resource load isn't subject to frame-ancestors at all. Carousel
+        // falls back to the poster + tap-to-watch-on-Drive if this fails.
+        videoMediaUrl: `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`,
         driveUrl: `https://drive.google.com/file/d/${file.id}/view`
       };
     }
@@ -124,7 +129,7 @@ window.DriveModule = (function () {
         const subgroup = await buildGroup(child.id, child.name, apiKey, depth + 1);
         group.groups.push(subgroup);
       } else {
-        group.items.push(classifyFile(child));
+        group.items.push(classifyFile(child, apiKey));
       }
     }
     return group;
@@ -153,7 +158,7 @@ window.DriveModule = (function () {
   async function discoverSidebarFolders(motherFolderId, apiKey) {
     const children = await listChildren(motherFolderId, apiKey);
     const subfolders = children.filter((c) => c.mimeType === FOLDER_MIME);
-    const looseFiles = children.filter((c) => c.mimeType !== FOLDER_MIME).map(classifyFile);
+    const looseFiles = children.filter((c) => c.mimeType !== FOLDER_MIME).map((f) => classifyFile(f, apiKey));
 
     const entries = subfolders.map((f) => ({ id: f.id, label: f.name }));
     if (looseFiles.length) {
