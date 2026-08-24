@@ -24,9 +24,9 @@ window.CarouselModule = (function () {
     container = el("div", "carousel");
     container.innerHTML = `
       <div class="carousel__stage">
-        <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8250;</button>
+        <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8249;</button>
         <div class="carousel__frame-wrap"></div>
-        <button class="carousel__nav carousel__nav--next" aria-label="הבא">&#8249;</button>
+        <button class="carousel__nav carousel__nav--next" aria-label="הבא">&#8250;</button>
         <button class="carousel__expand" aria-label="מסך מלא">&#10021;</button>
       </div>
       <div class="carousel__meta">
@@ -45,9 +45,9 @@ window.CarouselModule = (function () {
 
     document.addEventListener("keydown", (e) => {
       if (!mounted) return;
-      // RTL layout: next sits visually on the left, previous on the right.
-      if (e.key === "ArrowLeft") show(index + 1);
-      if (e.key === "ArrowRight") show(index - 1);
+      // Physical left/right, matching the nav buttons — not mirrored for RTL.
+      if (e.key === "ArrowLeft") show(index - 1);
+      if (e.key === "ArrowRight") show(index + 1);
       if (e.key === "Escape" && container.classList.contains("is-fullscreen")) toggleFullscreen();
     });
 

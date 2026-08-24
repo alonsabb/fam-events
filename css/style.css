@@ -442,14 +442,17 @@ button {
   z-index: 2;
 }
 
+/* Physical left/right, not inset-inline-start/end — a photo carousel's
+   prev/next controls follow universal left-back / right-forward navigation
+   regardless of the page's RTL text direction, unlike text-flow chevrons. */
 .carousel__nav--prev {
-  inset-inline-start: 0.75rem;
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .carousel__nav--next {
-  inset-inline-end: 0.75rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
 }
