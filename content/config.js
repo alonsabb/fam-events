@@ -17,16 +17,6 @@ window.PARTY_CONTENT = {
         "heroImageDriveId": null
       },
       "driveFolderId": "1zA-2jfoI7GleHwM9zssACMwzGFNAK-ZA"
-    },
-    {
-      "id": "",
-      "hero": {
-        "name": "כעככ",
-        "subtitle": "עכעכ",
-        "date": "כעכ",
-        "heroImageDriveId": null
-      },
-      "driveFolderId": "1zA-2jfoI7GleHwM9zssACMwzGFNAK-ZA"
     }
   ]
 };
