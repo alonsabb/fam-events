@@ -445,16 +445,23 @@ button {
 /* Physical left/right, not inset-inline-start/end — a photo carousel's
    prev/next controls follow universal left-back / right-forward navigation
    regardless of the page's RTL text direction, unlike text-flow chevrons. */
-.carousel__nav--prev {
-  left: 0.75rem;
+.carousel__nav--prev,
+.carousel__nav--next {
   top: 50%;
   transform: translateY(-50%);
+  /* ‹ and › (like most arrow/bracket characters) have the Unicode
+     Bidi_Mirrored property — browsers auto-flip their glyph shape inside
+     RTL text, which silently reversed how these look despite the markup
+     being correct. Forcing an LTR run stops that auto-mirroring. */
+  direction: ltr;
+}
+
+.carousel__nav--prev {
+  left: 0.75rem;
 }
 
 .carousel__nav--next {
   right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .carousel__expand {
