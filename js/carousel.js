@@ -98,7 +98,22 @@ window.CarouselModule = (function () {
         frameWrap.appendChild(buildFallback(item));
       };
       image.src = item.imageUrl;
-      frameWrap.appendChild(image);
+
+      if (item.kind === "video") {
+        // Poster thumbnail only — Drive's embed iframe doesn't reliably play
+        // video (see drive.js classifyFile) — so the poster links out to
+        // Drive to actually watch, with a play icon marking it as a video.
+        const link = document.createElement("a");
+        link.className = "carousel__video-link";
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.href = item.driveUrl || "#";
+        link.appendChild(image);
+        link.appendChild(el("span", "carousel__play-icon", "&#9658;"));
+        frameWrap.appendChild(link);
+      } else {
+        frameWrap.appendChild(image);
+      }
     } else if (item.embedUrl) {
       const frame = document.createElement("iframe");
       frame.className = "carousel__frame";

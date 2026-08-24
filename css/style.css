@@ -367,6 +367,32 @@ button {
   object-fit: contain;
 }
 
+.carousel__video-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.carousel__play-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(24, 15, 9, 0.55);
+  color: #fff;
+  font-size: 1.4rem;
+  /* nudge the ▶ glyph to look centered rather than optically off */
+  padding-inline-start: 0.25rem;
+}
+
 .carousel__fallback,
 .carousel__demo {
   width: 100%;
