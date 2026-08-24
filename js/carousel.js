@@ -96,21 +96,27 @@ window.CarouselModule = (function () {
     fallback.hidden = true;
     demo.hidden = true;
     frame.src = "about:blank";
-    image.src = "";
 
     if (isDemo) {
       demo.hidden = false;
       demo.style.background = item.color || "var(--viewer-bg-soft)";
       demoLabel.textContent = item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה";
     } else if (item.imageUrl) {
-      image.hidden = false;
-      image.onerror = () => {
-        // Rare fallback if the direct image load itself ever fails.
-        image.hidden = true;
+      // A fresh <img> per render rather than reusing/re-toggling the same
+      // element — reusing one persistent element with src="" clearing and
+      // hidden toggling was silently breaking the load (proven by
+      // gallery.html: identical URLs load fine with fresh elements).
+      const freshImage = document.createElement("img");
+      freshImage.className = "carousel__image";
+      freshImage.alt = "";
+      freshImage.onerror = () => {
+        freshImage.hidden = true;
         fallback.hidden = false;
         fallbackLink.href = item.driveUrl || "#";
       };
-      image.src = item.imageUrl;
+      freshImage.src = item.imageUrl;
+      image.replaceWith(freshImage);
+      image = freshImage;
     } else if (item.embedUrl) {
       frame.hidden = false;
       frame.src = item.embedUrl;
