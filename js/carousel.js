@@ -8,7 +8,7 @@
 window.CarouselModule = (function () {
   "use strict";
 
-  let container, frame, image, fallback, fallbackLink, demo, demoLabel, caption, counter;
+  let container, frameWrap, caption, counter;
   let items = [];
   let index = 0;
   let mounted = false;
@@ -25,16 +25,7 @@ window.CarouselModule = (function () {
     container.innerHTML = `
       <div class="carousel__stage">
         <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8250;</button>
-        <div class="carousel__frame-wrap">
-          <img class="carousel__image" alt="" hidden />
-          <iframe class="carousel__frame" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
-          <div class="carousel__fallback" hidden>
-            <a class="carousel__fallback-link" target="_blank" rel="noopener">פתח בדרייב</a>
-          </div>
-          <div class="carousel__demo" hidden>
-            <span class="carousel__demo-label"></span>
-          </div>
-        </div>
+        <div class="carousel__frame-wrap"></div>
         <button class="carousel__nav carousel__nav--next" aria-label="הבא">&#8249;</button>
         <button class="carousel__expand" aria-label="מסך מלא">&#10021;</button>
       </div>
@@ -44,12 +35,7 @@ window.CarouselModule = (function () {
       </div>
     `;
 
-    frame = container.querySelector(".carousel__frame");
-    image = container.querySelector(".carousel__image");
-    fallback = container.querySelector(".carousel__fallback");
-    fallbackLink = container.querySelector(".carousel__fallback-link");
-    demo = container.querySelector(".carousel__demo");
-    demoLabel = container.querySelector(".carousel__demo-label");
+    frameWrap = container.querySelector(".carousel__frame-wrap");
     caption = container.querySelector(".carousel__caption");
     counter = container.querySelector(".carousel__counter");
 
@@ -88,44 +74,53 @@ window.CarouselModule = (function () {
     }
   }
 
+  // Stage is cleared and rebuilt from scratch on every render — exactly the
+  // pattern proven to work in gallery.html — rather than reusing/toggling a
+  // fixed set of sibling elements (img/iframe/fallback/demo stacked with
+  // position:absolute + z-index), which silently failed to display images
+  // even after switching to fresh <img> elements alone.
   function renderCurrent() {
     const item = items[index];
     const isDemo = item.kind === "image-demo" || item.kind === "video-demo";
-    frame.hidden = true;
-    image.hidden = true;
-    fallback.hidden = true;
-    demo.hidden = true;
-    frame.src = "about:blank";
+    frameWrap.innerHTML = "";
 
     if (isDemo) {
-      demo.hidden = false;
+      const demo = el("div", "carousel__demo");
       demo.style.background = item.color || "var(--viewer-bg-soft)";
-      demoLabel.textContent = item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה";
+      demo.appendChild(el("span", "carousel__demo-label", item.kind === "image-demo" ? "תמונת דוגמה" : "סרטון דוגמה"));
+      frameWrap.appendChild(demo);
     } else if (item.imageUrl) {
-      // A fresh <img> per render rather than reusing/re-toggling the same
-      // element — reusing one persistent element with src="" clearing and
-      // hidden toggling was silently breaking the load (proven by
-      // gallery.html: identical URLs load fine with fresh elements).
-      const freshImage = document.createElement("img");
-      freshImage.className = "carousel__image";
-      freshImage.alt = "";
-      freshImage.onerror = () => {
-        freshImage.hidden = true;
-        fallback.hidden = false;
-        fallbackLink.href = item.driveUrl || "#";
+      const image = document.createElement("img");
+      image.className = "carousel__image";
+      image.alt = "";
+      image.onerror = () => {
+        frameWrap.innerHTML = "";
+        frameWrap.appendChild(buildFallback(item));
       };
-      freshImage.src = item.imageUrl;
-      image.replaceWith(freshImage);
-      image = freshImage;
+      image.src = item.imageUrl;
+      frameWrap.appendChild(image);
     } else if (item.embedUrl) {
-      frame.hidden = false;
+      const frame = document.createElement("iframe");
+      frame.className = "carousel__frame";
+      frame.allowFullscreen = true;
+      frame.allow = "autoplay; encrypted-media; fullscreen";
       frame.src = item.embedUrl;
+      frameWrap.appendChild(frame);
     } else {
-      fallback.hidden = false;
-      fallbackLink.href = item.driveUrl || "#";
+      frameWrap.appendChild(buildFallback(item));
     }
     caption.textContent = item.name || "";
     counter.textContent = `${index + 1} מתוך ${items.length}`;
+  }
+
+  function buildFallback(item) {
+    const fallback = el("div", "carousel__fallback");
+    const link = el("a", "carousel__fallback-link", "פתח בדרייב");
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.href = item.driveUrl || "#";
+    fallback.appendChild(link);
+    return fallback;
   }
 
   // Navigation (prev/next/keyboard/swipe) — wrapped in its own transition
