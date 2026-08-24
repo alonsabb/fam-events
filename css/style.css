@@ -1,23 +1,23 @@
 /* ==========================================================================
-   Design tokens — bright & cheery warm palette
+   Design tokens — warm cream & muted teal palette
    ========================================================================== */
 :root {
-  --bg: #fff3e4;
-  --surface: #ffffff;
-  --surface-warm: #ffe8d1;
-  --ink: #4a2e1a;
-  --ink-dim: #8a6b52;
+  --bg: #f3e7d3;
+  --surface: #fffaf3;
+  --surface-warm: #ecdbbd;
+  --ink: #3a2a1c;
+  --ink-dim: #7d6a56;
 
-  --coral: #ff6f4d;
-  --coral-deep: #e8532f;
-  --gold: #ffb648;
-  --pink: #ff6f91;
+  --coral: #4fa8ba;
+  --coral-deep: #2f7f91;
+  --gold: #dba852;
+  --pink: #c17b56;
 
   --viewer-bg: #241a12;
   --viewer-bg-soft: #33261a;
   --scrim: rgba(24, 15, 9, 0.93);
   --error: #d64545;
-  --shadow: rgba(139, 74, 33, 0.18);
+  --shadow: rgba(58, 42, 28, 0.16);
 
   --font-display: Georgia, "David", "Times New Roman", "Noto Serif Hebrew", serif;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Arial Hebrew", system-ui, sans-serif;
@@ -77,23 +77,23 @@ button {
   width: 55vw;
   height: 55vw;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.55;
-  animation: drift 16s ease-in-out infinite;
+  filter: blur(90px);
+  opacity: 0.28;
+  animation: drift 26s ease-in-out infinite;
 }
 
 .backdrop__blob--1 {
   top: -12%;
   left: -12%;
   background: radial-gradient(circle, var(--coral) 0%, transparent 68%);
-  animation-duration: 15s;
+  animation-duration: 24s;
 }
 
 .backdrop__blob--2 {
   bottom: -20%;
   right: -12%;
   background: radial-gradient(circle, var(--gold) 0%, transparent 68%);
-  animation-duration: 19s;
+  animation-duration: 29s;
   animation-delay: -5s;
 }
 
@@ -103,9 +103,9 @@ button {
   width: 42vw;
   height: 42vw;
   background: radial-gradient(circle, var(--pink) 0%, transparent 68%);
-  animation-duration: 23s;
+  animation-duration: 34s;
   animation-delay: -10s;
-  opacity: 0.4;
+  opacity: 0.18;
 }
 
 @keyframes drift {
@@ -124,8 +124,8 @@ button {
 
 @keyframes rise {
   0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
-  10% { opacity: 0.65; }
-  85% { opacity: 0.55; }
+  10% { opacity: 0.3; }
+  85% { opacity: 0.22; }
   100% { transform: translate(var(--drift-x, 30px), -115vh) scale(1.1); opacity: 0; }
 }
 
@@ -243,13 +243,13 @@ button {
 }
 
 .sidebar__link:hover {
-  background: rgba(255, 111, 77, 0.1);
+  background: rgba(79, 168, 186, 0.1);
   color: var(--ink);
 }
 
 .sidebar__link.is-active {
-  background: rgba(255, 111, 77, 0.14);
-  border-color: rgba(255, 111, 77, 0.4);
+  background: rgba(79, 168, 186, 0.14);
+  border-color: rgba(79, 168, 186, 0.4);
   color: var(--coral-deep);
   font-weight: 600;
 }
@@ -314,7 +314,7 @@ button {
   left: 50%;
   transform: translateX(-50%);
   background: var(--surface);
-  border: 1px dashed rgba(255, 111, 77, 0.45);
+  border: 1px dashed rgba(79, 168, 186, 0.45);
   border-radius: var(--radius);
   padding: 0.6rem 1rem;
   font-size: 0.85rem;
@@ -510,7 +510,7 @@ body.carousel-fullscreen {
 
 .picker__card {
   background: var(--surface);
-  border: 1px solid rgba(255, 111, 77, 0.25);
+  border: 1px solid rgba(79, 168, 186, 0.25);
   border-radius: var(--radius);
   color: var(--ink);
   padding: 2rem 1.25rem;
@@ -560,7 +560,7 @@ body.carousel-fullscreen {
   max-height: 85vh;
   overflow-y: auto;
   background: var(--surface);
-  border: 1px solid rgba(255, 111, 77, 0.25);
+  border: 1px solid rgba(79, 168, 186, 0.25);
   border-radius: var(--radius);
   padding: 2rem;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
