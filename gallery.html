@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>גלריה פשוטה — בדיקה</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #1a1a1a; color: #eee; padding: 1.5rem; }
+    img { display: block; max-width: 100%; height: auto; margin-bottom: 0.5rem; border-radius: 8px; }
+    .item { margin-bottom: 2.5rem; }
+    .name { font-size: 0.85rem; color: #aaa; word-break: break-all; }
+    .status { color: #f88; }
+  </style>
+</head>
+<body>
+  <h1>גלריה פשוטה (בלי iframe, בלי קרוסלה — כל תמונה מוצגת ישירות)</h1>
+  <div id="list">טוען…</div>
+
+  <script src="content/config.js"></script>
+  <script src="js/drive.js"></script>
+  <script>
+    (async function () {
+      const list = document.getElementById("list");
+      const config = window.PARTY_CONTENT;
+      try {
+        const section = config.sections[0];
+        const folders = await window.DriveModule.discoverSidebarFolders(section.driveFolderId, config.driveApiKey);
+        list.innerHTML = "";
+        for (const folder of folders) {
+          const heading = document.createElement("h2");
+          heading.textContent = folder.label;
+          list.appendChild(heading);
+
+          const items = folder.directItems || await window.DriveModule.buildFlatFolder(folder, config.driveApiKey);
+          for (const item of items) {
+            const wrap = document.createElement("div");
+            wrap.className = "item";
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = `${item.name} (${item.kind})`;
+            wrap.appendChild(name);
+
+            if (item.imageUrl) {
+              const img = document.createElement("img");
+              img.alt = item.name;
+              img.addEventListener("load", () => console.log("LOADED:", item.name));
+              img.addEventListener("error", () => console.log("FAILED:", item.name));
+              img.src = item.imageUrl;
+              wrap.appendChild(img);
+            } else {
+              const p = document.createElement("p");
+              p.className = "status";
+              p.textContent = "(no direct image URL for this item type)";
+              wrap.appendChild(p);
+            }
+            list.appendChild(wrap);
+          }
+        }
+      } catch (err) {
+        list.textContent = "שגיאה: " + err.message;
+      }
+    })();
+  </script>
+</body>
+</html>
