@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  const COLORS = ["#2f7f91", "#1f5c6b", "#3a6b52", "#24475a", "#4a8a6e"];
+  const COLORS = ["#6fc0da", "#8fd3e8", "#5aa8c9", "#7ec8dd", "#4f9bbd"];
   const COUNT = 26;
 
   function rand(min, max) {
