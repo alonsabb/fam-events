@@ -1,7 +1,9 @@
 // ============================================================================
-// Boots the page: shows an event picker if there's more than one section
-// (invisible today, since there's only one), then renders a sidebar of that
-// event's Drive folders + a content pane that shows the selected folder as a
+// Boots the page: discovers events by listing the direct subfolders of one
+// hardcoded root folder in Drive (each event = one folder, its Drive name
+// IS the event name — no config edit needed to add an event), shows a
+// picker if there's more than one, then renders a sidebar of that event's
+// own Drive subfolders + a content pane that shows the selected folder as a
 // fullscreen-capable carousel.
 // ============================================================================
 
@@ -38,33 +40,31 @@
     return items;
   }
 
-  async function discoverFolders(section) {
-    if (window.DriveModule.isConfigured(config) && !window.DriveModule.isPlaceholder(section.driveFolderId)) {
-      return { entries: await window.DriveModule.discoverSidebarFolders(section.driveFolderId, config.driveApiKey), demo: false };
+  // Same "list direct subfolders" mechanism used at two levels: the root
+  // folder's subfolders become events, and an event folder's subfolders
+  // become its sidebar categories — both just discoverSidebarFolders on a
+  // different folder ID.
+  async function discoverFolders(folderId) {
+    if (window.DriveModule.isConfigured(config) && !window.DriveModule.isPlaceholder(folderId)) {
+      return { entries: await window.DriveModule.discoverSidebarFolders(folderId, config.driveApiKey), demo: false };
     }
     return { entries: window.DriveModule.getMockSidebarFolders(), demo: true };
   }
 
-  function renderEventLayout(section) {
+  function renderEventLayout(event, allEvents, demo) {
     app.innerHTML = "";
     const layout = el("div", "layout");
 
     const sidebar = el("aside", "sidebar");
-    const header = el(
-      "div",
-      "sidebar__header",
-      `<h1>${section.hero.name}</h1>
-       <p class="sidebar__subtitle">${section.hero.subtitle || ""}</p>
-       <p class="sidebar__date">${section.hero.date || ""}</p>`
-    );
+    const header = el("div", "sidebar__header", `<h1>${event.label}</h1>`);
     sidebar.appendChild(header);
 
-    if (config.sections.length > 1) {
+    if (allEvents.length > 1) {
       const back = el("a", "sidebar__back", "&rarr; כל האירועים");
       back.href = "#";
       back.addEventListener("click", (e) => {
         e.preventDefault();
-        renderPicker();
+        renderPicker(allEvents, demo);
       });
       sidebar.appendChild(back);
     }
@@ -72,11 +72,6 @@
     const nav = el("nav", "sidebar__nav", `<p class="sidebar__nav-status">טוען תיקיות…</p>`);
     let links = [];
     sidebar.appendChild(nav);
-
-    const adminLink = el("a", "sidebar__admin", "ניהול");
-    adminLink.href = "#";
-    adminLink.setAttribute("data-admin-link", "");
-    sidebar.appendChild(adminLink);
 
     const overlay = el("div", "sidebar-overlay");
     function closeDrawer() {
@@ -102,8 +97,6 @@
     app.appendChild(overlay);
     app.appendChild(layout);
 
-    window.AdminModule.init(config);
-
     async function selectFolder(root, activeLink) {
       links.forEach((l) => l.classList.remove("is-active"));
       activeLink.classList.add("is-active");
@@ -127,7 +120,7 @@
               el(
                 "p",
                 "content-pane__status content-pane__status--demo",
-                "מוצג תוכן לדוגמה — יש להגדיר בקובץ content/config.js מפתח Drive API אמיתי ומזהי תיקיות אמיתיים כדי להחליף זאת."
+                "מוצג תוכן לדוגמה — יש להגדיר בקובץ content/config.js מפתח Drive API אמיתי ותיקיית אם אמיתית כדי להחליף זאת."
               )
             );
           }
@@ -147,12 +140,12 @@
       }
     }
 
-    discoverFolders(section)
-      .then(({ entries, demo }) => {
+    discoverFolders(event.id)
+      .then(({ entries, demo: subDemo }) => {
         nav.innerHTML = "";
         links = [];
         if (!entries.length) {
-          nav.appendChild(el("p", "sidebar__nav-status", "לא נמצאו תיקיות תחת תיקיית האם."));
+          nav.appendChild(el("p", "sidebar__nav-status", "לא נמצאו תיקיות תחת תיקיית האירוע."));
           return;
         }
         entries.forEach((entry) => {
@@ -161,12 +154,12 @@
           nav.appendChild(link);
           links.push(link);
         });
-        if (demo) {
+        if (subDemo) {
           nav.appendChild(
             el(
               "p",
               "sidebar__nav-status sidebar__nav-status--demo",
-              "תוכן לדוגמה — הגדירו driveFolderId אמיתי ב-content/config.js."
+              "תוכן לדוגמה — הגדירו rootFolderId אמיתי ב-content/config.js."
             )
           );
         }
@@ -184,34 +177,41 @@
       });
   }
 
-  function renderPicker() {
+  function renderPicker(entries, demo) {
     app.innerHTML = "";
     const wrap = el("div", "picker");
     wrap.appendChild(el("h1", "picker__title", "אירועים משפחתיים"));
     const grid = el("div", "picker__grid");
-    config.sections.forEach((section) => {
-      const card = el(
-        "button",
-        "picker__card",
-        `<h2>${section.hero.name}</h2><p>${section.hero.subtitle || ""}</p><p class="picker__date">${section.hero.date || ""}</p>`
-      );
-      card.addEventListener("click", () => renderEventLayout(section));
+    entries.forEach((entry) => {
+      const card = el("button", "picker__card", `<h2>${entry.label}</h2>`);
+      card.addEventListener("click", () => renderEventLayout(entry, entries, demo));
       grid.appendChild(card);
     });
     wrap.appendChild(grid);
     app.appendChild(wrap);
-    window.AdminModule.init(config);
   }
 
-  function boot() {
+  async function boot() {
     if (!config) {
       app.textContent = "קובץ content/config.js חסר";
       return;
     }
-    if (config.sections.length > 1) {
-      renderPicker();
-    } else {
-      renderEventLayout(config.sections[0]);
+
+    app.innerHTML = `<p class="content-pane__status" style="margin:4rem auto;">טוען אירועים…</p>`;
+
+    try {
+      const { entries, demo } = await discoverFolders(config.rootFolderId);
+      if (!entries.length) {
+        app.textContent = "לא נמצאו תיקיות אירוע תחת תיקיית האם.";
+        return;
+      }
+      if (entries.length > 1) {
+        renderPicker(entries, demo);
+      } else {
+        renderEventLayout(entries[0], entries, demo);
+      }
+    } catch (err) {
+      app.textContent = `שגיאה בטעינת רשימת האירועים (${err.message}).`;
     }
   }
 

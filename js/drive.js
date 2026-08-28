@@ -1,8 +1,9 @@
 // ============================================================================
 // Google Drive API integration.
-// The app points at ONE "mother" folder per event. Its direct subfolders
-// become the sidebar entries automatically (no manual folder-ID entry) —
-// subfolder names ARE the labels. Drive shortcuts inside the mother folder
+// The app points at ONE hardcoded root folder. Its direct subfolders become
+// events (subfolder name IS the event name); each event's own subfolders
+// become that event's sidebar entries — same discovery mechanism, one level
+// down. No manual folder-ID entry per event or category. Drive shortcuts
 // (e.g. a shortcut to a folder someone else shared with you) are resolved
 // to their real target, so folders from anywhere in Drive can be included
 // without duplicating content. Falls back to small demo content when the
@@ -25,11 +26,7 @@ window.DriveModule = (function () {
   }
 
   function isConfigured(config) {
-    return (
-      !isPlaceholder(config.driveApiKey) &&
-      Array.isArray(config.sections) &&
-      config.sections.some((s) => !isPlaceholder(s.driveFolderId))
-    );
+    return !isPlaceholder(config.driveApiKey) && !isPlaceholder(config.rootFolderId);
   }
 
   // A shortcut's own id/name are its own, but it should behave exactly like
