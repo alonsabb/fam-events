@@ -82,7 +82,7 @@ window.DriveModule = (function () {
       return {
         ...base,
         kind: "slides",
-        embedUrl: `https://docs.google.com/presentation/d/${file.id}/embed?start=false&loop=false&delayms=3000`,
+        embedUrl: `https://docs.google.com/presentation/d/${file.id}/embed?start=true&loop=false&delayms=3000`,
         driveUrl: `https://docs.google.com/presentation/d/${file.id}/view`
       };
     }
