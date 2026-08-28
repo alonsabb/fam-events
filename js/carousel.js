@@ -23,15 +23,15 @@ window.CarouselModule = (function () {
   function build() {
     container = el("div", "carousel");
     container.innerHTML = `
+      <div class="carousel__meta">
+        <span class="carousel__caption"></span>
+        <span class="carousel__counter"></span>
+      </div>
       <div class="carousel__stage">
         <button class="carousel__nav carousel__nav--prev" aria-label="הקודם">&#8249;</button>
         <div class="carousel__frame-wrap"></div>
         <button class="carousel__nav carousel__nav--next" aria-label="הבא">&#8250;</button>
         <button class="carousel__expand" aria-label="מסך מלא">&#10021;</button>
-      </div>
-      <div class="carousel__meta">
-        <span class="carousel__caption"></span>
-        <span class="carousel__counter"></span>
       </div>
     `;
 
