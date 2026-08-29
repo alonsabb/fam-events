@@ -213,11 +213,51 @@ button {
 }
 
 .sidebar__back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-top: 1.25rem;
+  background: rgba(79, 168, 186, 0.16);
   color: var(--coral-deep);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  width: fit-content;
+  transition: background 0.2s ease;
+}
+
+.sidebar__back:hover {
+  background: rgba(79, 168, 186, 0.28);
+}
+
+/* Fixed, always-visible duplicate of the sidebar back-link — the sidebar
+   one is easy to miss (buried in a collapsed drawer on mobile, or just low
+   in visual weight), so this stays on top of everything at a fixed screen
+   position regardless of scroll, sidebar state, or viewport width. */
+.back-to-events {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--coral-deep);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.back-to-events:hover {
+  background: var(--coral);
+  transform: translateY(-1px);
 }
 
 .sidebar__nav {

@@ -60,13 +60,20 @@
     sidebar.appendChild(header);
 
     if (allEvents.length > 1) {
-      const back = el("a", "sidebar__back", "&rarr; כל האירועים");
-      back.href = "#";
-      back.addEventListener("click", (e) => {
+      const goToPicker = (e) => {
         e.preventDefault();
         renderPicker(allEvents, demo);
-      });
+      };
+
+      const back = el("a", "sidebar__back", "&rarr; כל האירועים");
+      back.href = "#";
+      back.addEventListener("click", goToPicker);
       sidebar.appendChild(back);
+
+      const floatingBack = el("a", "back-to-events", "&rarr; כל האירועים");
+      floatingBack.href = "#";
+      floatingBack.addEventListener("click", goToPicker);
+      app.appendChild(floatingBack);
     }
 
     const nav = el("nav", "sidebar__nav", `<p class="sidebar__nav-status">טוען תיקיות…</p>`);
